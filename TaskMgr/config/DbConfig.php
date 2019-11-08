@@ -1,5 +1,5 @@
 <?php
-namespace TaskMgr;
+namespace TaskMgr\Config;
 
 class DbConfig{
     public const HOST = "nbc.local.arkprojects.space"; //resolve to nb in lan (192.168.1.51)

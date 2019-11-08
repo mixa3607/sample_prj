@@ -1,11 +1,11 @@
 <?php
-
-
 namespace TaskMgr;
 
-use mysqli;
+require_once $_SERVER['DOCUMENT_ROOT'] . '/config/DbConfig.php';
 
-require 'config/db_config.php';
+use mysqli;
+use TaskMgr\Config\DbConfig;
+
 class Db
 {
     private static $db = null;

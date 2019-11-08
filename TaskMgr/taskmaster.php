@@ -1,10 +1,11 @@
 <?php
 namespace TaskMgr;
 
-require 'DbTaskMgr.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/class/DbTaskMgr.php';
 
 $user_id = DbTaskMgr::ValidateAuthCookie($_COOKIE['auth']);
 $action = $_POST['action'];
+
 if ($user_id == -1){
     http_response_code(401); //unauthorized
     return;
@@ -21,7 +22,6 @@ if ($action == "add"){
 }
 if ($action == "delete" or $action == "complete"){
     $str = htmlspecialchars($_POST["ids"]);
-    //$ids_str = explode(',', $str);
     if (strlen($str) != 0){
         try{
             $ids = explode(',', $str);

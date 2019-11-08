@@ -1,8 +1,8 @@
 <?php
 namespace TaskMgr;
 
-require 'Utils.php';
-require 'db.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/class/Utils.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/class/Db.php';
 
 class DbTaskMgr
 {
@@ -35,6 +35,18 @@ class DbTaskMgr
         else:
             return -1;
         endif;
+    }
+
+    public static function CheckUserExist($login): bool{
+        $db_stmt = Db::GetDb()->prepare("SELECT id FROM users WHERE login=? LIMIT 1");
+        $db_stmt->bind_param("s", $login);
+        $result = $db_stmt->execute();
+        if ($result){
+            $result = $db_stmt->get_result();
+            return $result->num_rows >= 1;
+        }
+
+        return $result;
     }
 
     public static function GetNewAuthCookie($user_id): ?array {

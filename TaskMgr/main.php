@@ -1,8 +1,8 @@
 <div>
-    <?php include 'header.php'?>
+    <?php include_once $_SERVER['DOCUMENT_ROOT'] . '/header.php'?>
     <div>
         <h1>Login</h1>
-        <form action="login.php" method="post">
+        <form action="/auth/login.php" method="post">
             <p>Login: <input type="text" name="login" /></p>
             <p>Password: <input type="password" name="password" /></p>
             <p><input type="submit" /></p>
@@ -12,7 +12,7 @@
     <div>
         <div>
             <h1>Registry</h1>
-            <form action="registry.php" method="post">
+            <form action="/auth/registry.php" method="post">
                 <p>Login: <input type="text" name="login" /></p>
                 <p>Password: <input type="password" name="password" /></p>
                 <p>Repeat password: <input type="password" name="r_password" /></p>
