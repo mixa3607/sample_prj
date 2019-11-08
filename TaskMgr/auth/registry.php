@@ -17,7 +17,7 @@ if (DbTaskMgr::CheckUserExist($login)){
 elseif ($r_password != $password){
     Utils::ShowAlertAndRedirect("Passwords not equal!", "/main.php");
 }
-elseif (ctype_alnum($login) and ctype_alnum($password)){
+elseif (!(ctype_alnum($login) and ctype_alnum($password))){
     Utils::ShowAlertAndRedirect("Allow only digits and letters!", "/main.php");
 }
 else{
@@ -26,7 +26,7 @@ else{
         $result = DbTaskMgr::GetNewAuthCookie($user_id);
         if ($result != null){
             list($cookie, $expire_date) = $result;
-            setcookie("auth", $cookie, $expire_date);
+            setcookie("auth", $cookie, $expire_date, "/");
             header("Location: /taskmgr.php");
             return;
         }
