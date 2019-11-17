@@ -1,6 +1,6 @@
 <?php
 
-use Api\Book;
+use Api\BookApi;
 
 spl_autoload_register(function ($class) {
     include $class . '.php';
@@ -19,7 +19,7 @@ if ($path_nodes[1] != "api"){
 
 switch ($path_nodes[2]){
     case "book":
-        $api = new Book($_SERVER['REQUEST_METHOD'], $args);
+        $api = new BookApi($_SERVER['REQUEST_METHOD'], $args);
         $api->run();
         break;
     default:
