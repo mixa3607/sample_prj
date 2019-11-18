@@ -4,7 +4,7 @@ namespace Api;
 
 abstract class ApiProt
 {
-    protected $method;
+    protected $action;
     protected $args;
 
     public function __construct($method, $args) {
@@ -12,48 +12,63 @@ abstract class ApiProt
         header("Access-Control-Allow-Methods: *");
         header("Content-Type: application/json");
 
-        $this->method = $method;
+        $this->action = $this->getActionName($method);
         $this->args = $args;
     }
 
     public function run(){
-        $action = $this->getActionName();
-        if ($action != null){
-            $this->$action();
+        //$action = $this->getActionName();
+        if ($this->action != null){
+            $this->{$this->action}();
         }
         else{
-            print($this->response(Array('error' => "Method not allowed"), 405));
+            $str = $this->returnError(405, 405);
+            print($str);
         }
     }
 
-    protected function getActionName() : ?string
+    protected function getActionName(string $method) : ?string
     {
-        $method = $this->method;
-        switch ($method) {
-            case 'GET':
-                return 'getAction';
-                break;
-            case 'POST':
-                return 'createAction';
-                break;
-            case 'PUT':
-                return 'updateAction';
-                break;
-            case 'DELETE':
-                return 'deleteAction';
-                break;
-            default:
-                return null;
+        $methods = [
+            'GET' => 'getAction',
+            'POST' => 'createAction',
+            'PUT' => 'updateAction',
+            'DELETE' => 'deleteAction'
+        ];
+        $action = $methods[$method];
+        if ($action && method_exists($this, $action)){
+            return $action;
+        }
+        else{
+            return null;
         }
     }
 
     protected function response($data, $status = 500) {
         http_response_code($status);
-        //header("HTTP/1.1 " . $status . " " . $this->requestStatus($status));
+        //$data['code'] = $status;
         return json_encode($data);
     }
 
-    private function requestStatus($code) {
+    protected function returnError(int $api_err_code, int $http_err_code, string $description = null){
+        http_response_code($http_err_code);
+        $err = ['code' => $api_err_code,
+            'code_name' => $this->getApiCodeStr($api_err_code),
+            'error_description' => $description];
+        return json_encode($err);
+    }
+
+    protected function getApiCodeStr(int $code): string {
+        $status = [200 => "OK",
+            404 => 'Not Found',
+            405 => 'Method Not Allowed',
+            449 => 'Retry With',
+            500 => 'Internal Server Error',
+            800 => 'Element Not Found'];
+        return ($status[$code])?$status[$code]:$status[500];
+    }
+
+    private function getHttpCodeStr($code) {
         $status = array(
             200 => 'OK',
             404 => 'Not Found',

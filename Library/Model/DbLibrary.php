@@ -8,16 +8,28 @@ use ClassDef\Book;
 
 class DbLibrary
 {
-    //public static function GetBooks($offset = 0, $count = 30){
-    //    $db_stmt = Db::GetDb()->prepare("select")
-    //}
-
     public static function AddImage($node_id, $name): ?int{
         $db_stmt = Db::GetDb()->prepare("insert into pictures (storage_id, upload_date, name)   value (?, now(), ?)");
         $db_stmt->bind_param("is", $node_id, $name);
         $db_stmt->execute();
         if ($db_stmt->affected_rows == 1){
             return $db_stmt->insert_id;
+        }
+        else{
+            return null;
+        }
+    }
+
+    public static function GetImageIdByName(string $name): ?int{
+        $db_stmt = Db::GetDb()->prepare("SELECT id
+FROM pictures
+WHERE `name` = ?");
+        $db_stmt->bind_param("s", $name);
+        $db_stmt->execute();
+        $db_result = $db_stmt->get_result();
+        if ($db_result->num_rows == 1){
+            $id = $db_result->fetch_row()[0];
+            return $id;
         }
         else{
             return null;
@@ -41,18 +53,47 @@ WHERE p.`name` = ?");
         }
     }
 
-    private static function AssignAuthorToBook($book_id, $author_id): int{
+    public static function AssignAuthorToBook($book_id, $author_id): int{
         $db_stmt = Db::GetDb()->prepare("insert into book_authors (book_id, author_id)  value (?, ?)");
         $db_stmt->bind_param("ii", $book_id, $author_id);
         $db_stmt->execute();
         return $db_stmt->insert_id;
     }
 
-    private static function AssignGenreToBook($book_id, $genre_id): int{
+    public static function AssignGenreToBook($book_id, $genre_id): int{
         $db_stmt = Db::GetDb()->prepare("insert into book_genres (book_id, genre_id)  value (?, ?)");
         $db_stmt->bind_param("ii", $book_id, $genre_id);
         $db_stmt->execute();
         return $db_stmt->insert_id;
+    }
+
+    public static function FlushBookAuthors($book_id): ?int{
+        $db_stmt = Db::GetDb()->prepare("DELETE FROM book_authors WHERE book_id = ?");
+        $db_stmt->bind_param("i", $book_id);
+        $db_stmt->execute();
+        return $db_stmt->affected_rows != 0?$db_stmt->affected_rows:null;
+    }
+
+    public static function FlushBookGenres($book_id): ?int{
+        $db_stmt = Db::GetDb()->prepare("DELETE FROM book_genres WHERE book_id = ?");
+        $db_stmt->bind_param("i", $book_id);
+        $db_stmt->execute();
+        return $db_stmt->affected_rows != 0?$db_stmt->affected_rows:null;
+    }
+
+    private static function DeassignAuthorToBook($book_id, $author_id): bool{
+        $db_stmt = Db::GetDb()->prepare("DELETE FROM book_authors WHERE book_id = ? AND author_id = ?");
+        $db_stmt->bind_param("ii", $book_id, $author_id);
+        $db_stmt->execute();
+        return $db_stmt->affected_rows != 0;
+    }
+
+    private static function DeassignGenreToBook($book_id, $genre_id): bool{
+        $db_stmt = Db::GetDb()->prepare("DELETE FROM book_genres WHERE book_id = ? AND genre_id = ?");
+        $db_stmt->bind_param("ii", $book_id, $genre_id);
+        $db_stmt->execute();
+        //$db_result = $db_stmt->get_result();
+        return $db_stmt->affected_rows != 0;
     }
 
     public static function GetBookGenres($book_id): ?array {
@@ -181,4 +222,54 @@ OFFSET ?");
             return null;
         }
     }
+
+
+    public static function GetBook($id): Book {
+        $db_stmt = Db::GetDb()->prepare("select b.id, b.`name` as title, CONCAT(s.path, p.`name`) as picture
+from books b 
+LEFT JOIN pictures p ON b.pic_id = p.id
+LEFT JOIN storages s ON p.storage_id = s.id
+where b.id = ?");
+        $db_stmt->bind_param("i", $id);
+        $db_stmt->execute();
+        if ($db_stmt->affected_rows != 0){
+            $db_result = $db_stmt->get_result();
+            $row = $db_result->fetch_row();
+            $book = new Book();
+            $book->id = $row[0];
+            $book->title = $row[1];
+            $book->image = $row[2];
+            $book->authors = DbLibrary::GetBookAuthors($book->id);
+            $book->genres = DbLibrary::GetBookGenres($book->id);
+            return $book;
+        }
+        else{
+            return null;
+        }
+    }
+
+    public static function DeleteBook(int $book_id): bool{
+        $db_stmt = Db::GetDb()->prepare("DELETE FROM books where id = ?");
+        $db_stmt->bind_param("i", $book_id);
+        $db_stmt->execute();
+        return $db_stmt->affected_rows != 0;
+    }
+
+    public static function UpdateBookTitle(int $book_id, string $name): bool{
+        $db_stmt = Db::GetDb()->prepare("UPDATE books SET `name`=? WHERE id = ?");
+        $db_stmt->bind_param("si", $name, $book_id);
+        $db_stmt->execute();
+        return $db_stmt->affected_rows != 0;
+    }
+
+    public static function UpdateBookImage(int $book_id, string $image_id): bool{
+        $db_stmt = Db::GetDb()->prepare("UPDATE books SET image=? WHERE id = ?");
+        $db_stmt->bind_param("ii", $image_id, $book_id);
+        $db_stmt->execute();
+        return $db_stmt->affected_rows != 0;
+    }
+
+
+
+
 }

@@ -1,6 +1,7 @@
 <?php
 
 use Api\BookApi;
+use Api\BooksApi;
 
 spl_autoload_register(function ($class) {
     include $class . '.php';
@@ -19,16 +20,15 @@ if ($path_nodes[1] != "api"){
 
 switch ($path_nodes[2]){
     case "book":
-        $api = new BookApi($_SERVER['REQUEST_METHOD'], $args);
-        $api->run();
-        break;
-    default:
-        echo json_encode(Array('code' => 404, 'error' => 'api not found'));
-        http_response_code(404);
-        break;
-}
+        $api = new BookApi($_SERVER['REQUEST_METHOD'], $args); break;
 
-function getArgs(): array {
-    parse_str($_SERVER['QUERY_STRING'], $args);
-    return $args;
+    case "books":
+        $api = new BooksApi($_SERVER['REQUEST_METHOD'], $args); break;
+    default:
+        print(json_encode(Array('code' => 404, 'error' => 'api not found')));
+        http_response_code(404);
+        return;
 }
+$api->run();
+
+return;
