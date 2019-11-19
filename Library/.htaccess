@@ -1,8 +1,14 @@
 IndexIgnore */*
 RewriteEngine on
+RewriteBase /
+
+#static
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^favicon.ico$ /static/images/favicon.ico [NC,QSA,L]
+#RewriteRule ^(static/.*)$ /$1 [NC,QSA,L]
 
 #front
-RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^api/(.*)$ /api.php [NC,QSA,L]
@@ -10,4 +16,4 @@ RewriteRule ^api/(.*)$ /api.php [NC,QSA,L]
 #api
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^.*$ /api.php [NC,QSA,L]
+RewriteRule ^.*$ /index.php [NC,QSA,L]

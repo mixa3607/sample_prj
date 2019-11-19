@@ -26,11 +26,18 @@ class BookApi extends ApiProt
         $image = $this->args['image'];
         $authors = $this->args['authors'];
         $genres = $this->args['genres'];
+        $pub_date = $this->args['pub_date'];
         //$authors = explode(',', $this->args['authors']);
         //$genres = explode(',', $this->args['genres']);
 
         if (!$image){
             $image = 'default.png';
+        }
+
+        if (!$pub_date){
+            $response = $this->returnError(449, 400, 'publish date is required');
+            print($response);
+            return;
         }
 
         if (!$title){
@@ -74,7 +81,7 @@ class BookApi extends ApiProt
             return;
         }
 
-        $book_id = DbLibrary::AddBook($title, $authors_ids, $genres_ids, $image_id);
+        $book_id = DbLibrary::AddBook($title, $authors_ids, $genres_ids, $image_id, $pub_date);
         if (!$book_id){
             $response = $this->returnError(500, 404, 'Error adding book');
             print($response);
@@ -110,6 +117,13 @@ class BookApi extends ApiProt
         $image = $this->args['image'];
         $authors = $this->args['authors'];
         $genres = $this->args['genres'];
+        $pub_date = $this->args['pub_date'];
+
+        if ($pub_date && DbLibrary::UpdateBookPublishDate($book_id, $pub_date)){
+            $response = $this->response(['book_id' => $book_id, 'pub_date' => $pub_date], 200);
+            print($response);
+            return;
+        }
 
         if ($book_id == null){
             $response = $this->returnError(500, 500, 'Book id is required');
