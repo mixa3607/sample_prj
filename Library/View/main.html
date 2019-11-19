@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Library</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script type="application/javascript" src="/static/js/main.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+
+    </div>
+    <div class="content">
+        <div class="books">
+            <table id="books_table">
+                <tbody>
+                <tr class="book" book="1">
+                    <td class="title-cell">
+                        <div class="flex-container">
+                            <button class="butt-title-edit">edit</button>
+                            <p class="book-title">title</p>
+                        </div>
+                    </td>
+                    <td class="authors-cell">
+                        <div class="flex-container flex-col">
+                            <div class="flex-container">
+                                <button class="butt-del-author">del</button>
+                                <p class="author-name">author</p></div>
+                            <div class="flex-container">
+                                <button class="butt-del-author">del</button>
+                                <p class="author-name">author2</p>
+                            </div>
+                            <div class="m-buttons">
+                                <button class="butt-add-author">add</button>
+                                <button hidden class="butt-apply-authors">apply</button>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="genres-cell">
+                        <div class="flex-container flex-col">
+                            <div class="flex-container">
+                                <button class="butt-del-genre">del</button>
+                                <p class="genre-name">genre</p></div>
+                            <div class="flex-container">
+                                <button class="butt-del-genre">del</button>
+                                <p class="genre-name">genre2</p>
+                            </div>
+                            <div class="m-buttons">
+                                <button class="butt-add-genre">add</button>
+                                <button hidden class="butt-apply-genres">apply</button>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="publish-date-cell">
+                        <div class="flex-container flex-col">
+                            <div class="flex-container">
+                                <button class="butt-pub-date-edit">edit</button>
+                                <p class="book-pub-date">2019-01-01</p>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <input type="text">
+            <div class="flex-container flex-col">
+                <div class="m-buttons">
+                    <button class="butt-add-genre">add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
