@@ -170,10 +170,10 @@ WHERE b.id = ?");
         return $results;
     }
 
-    public static function AddBook($name, $authors_ids, $genres_ids, $image_id): ?int{
+    public static function AddBook($name, $authors_ids, $genres_ids, $image_id, $pub_date): ?int{
         //insert book
-        $db_stmt = Db::GetDb()->prepare("insert into books (`name`, add_date, pic_id) value (?, now(), ?)");
-        $db_stmt->bind_param("si", $name, $image_id);
+        $db_stmt = Db::GetDb()->prepare("insert into books (`name`, add_date, pic_id, publish_date) value (?, now(), ?, ?)");
+        $db_stmt->bind_param("sis", $name, $image_id, $pub_date);
         $db_stmt->execute();
 
         //if success assign genres and authors to book
@@ -269,6 +269,12 @@ where b.id = ?");
         return $db_stmt->affected_rows != 0;
     }
 
+    public static function UpdateBookPublishDate(int $book_id, string $pub_date): bool{
+        $db_stmt = Db::GetDb()->prepare("UPDATE books SET publish_date= ? WHERE id = ?");
+        $db_stmt->bind_param("si", $pub_date, $book_id);
+        $db_stmt->execute();
+        return $db_stmt->affected_rows != 0;
+    }
 
 
 
