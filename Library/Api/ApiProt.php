@@ -65,7 +65,8 @@ abstract class ApiProt
             405 => 'Method Not Allowed',
             449 => 'Retry With',
             500 => 'Internal Server Error',
-            800 => 'Element Not Found'];
+            800 => 'Element Not Found',
+            801 => 'Already set'];
         return ($status[$code])?$status[$code]:$status[500];
     }
 

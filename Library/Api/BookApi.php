@@ -39,6 +39,11 @@ class BookApi extends ApiProt
             print($response);
             return;
         }
+        elseif (strtotime($pub_date) > time()){
+            $response = $this->returnError(449, 400, 'publish date is more then currrent');
+            print($response);
+            return;
+        }
 
         if (!$title){
             $response = $this->returnError(449, 400, 'title is required');
@@ -112,29 +117,52 @@ class BookApi extends ApiProt
     }
 
     public function updateAction(){
-        $book_id = $this->args['id'];
+        $book_id = intval($this->args['id']);
         $title = $this->args['title'];
         $image = $this->args['image'];
         $authors = $this->args['authors'];
         $genres = $this->args['genres'];
         $pub_date = $this->args['pub_date'];
 
-        if ($pub_date && DbLibrary::UpdateBookPublishDate($book_id, $pub_date)){
-            $response = $this->response(['book_id' => $book_id, 'pub_date' => $pub_date], 200);
-            print($response);
-            return;
-        }
-
-        if ($book_id == null){
+        if ($book_id == null || $book_id == 0){
             $response = $this->returnError(500, 500, 'Book id is required');
             print($response);
             return;
         }
 
-        if ($title && DbLibrary::UpdateBookTitle($book_id, $title)){
+        if ($pub_date){
+            if (strtotime($pub_date) > time()){
+                $response = $this->returnError(449, 400, 'publish date is more then currrent');
+            }
+            elseif (DbLibrary::UpdateBookPublishDate($book_id, $pub_date)){
+                $response = $this->response(['book_id' => $book_id, 'pub_date' => $pub_date], 200);
+            }
+            else{
+                if (DbLibrary::GetBook($book_id)->pubDate == $pub_date){
+                    $response = $this->returnError(801, 500, 'Already set to eq value');
+                }
+                else{
+                    $response = $this->returnError(500, 500, 'Failing update book publish date');
+                }
+            }
+            print($response);
+            return;
+        }
+
+        if ($title){
+            if (DbLibrary::UpdateBookTitle($book_id, $title)){
                 $response = $this->response(['book_id' => $book_id, 'title' => $title], 200);
-                print($response);
-                return;
+            }
+            else{
+                if (DbLibrary::GetBook($book_id)->title == $title){
+                    $response = $this->returnError(801, 500, 'Already set to eq value');
+                }
+                else{
+                    $response = $this->returnError(500, 500, 'Failing update book title');
+                }
+            }
+            print($response);
+            return;
         }
 
         if ($image && DbLibrary::UpdateBookImage($book_id, $image)){
