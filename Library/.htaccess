@@ -2,18 +2,18 @@ IndexIgnore */*
 RewriteEngine on
 RewriteBase /
 
-#static
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^favicon.ico$ /static/images/favicon.ico [NC,QSA,L]
-#RewriteRule ^(static/.*)$ /$1 [NC,QSA,L]
+#icon
+RewriteRule ^favicon.ico$ /static/images/favicon.ico [NC,L,END]
 
-#front
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^api/(.*)$ /api.php [NC,QSA,L]
+#static files
+RewriteCond %{REQUEST_FILENAME} "/static/.*"
+RewriteRule (.*) \1 [NC,L,END]
 
 #api
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^.*$ /index.php [NC,QSA,L]
+RewriteRule ^api/.*$ /api.php [NC,QSA,END]
+
+#front
+RewriteRule ^$ /index.php [NC,L,END]
+
+#redirect to front
+RewriteRule ^.*$ / [R=301,L]
