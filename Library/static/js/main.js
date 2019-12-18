@@ -160,3 +160,5 @@ function editDate(sender){
 }
 
 window.onload = addHandlers;
+var res = Api.getBooks();
+

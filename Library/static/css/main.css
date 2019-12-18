@@ -10,7 +10,7 @@
     flex-direction: column;
 }
 
-p{
+p, h4, h3{
     margin: 1px;
 }
 table {
@@ -22,16 +22,19 @@ td{
     border: 4px double black;
     border-collapse: collapse;
 }
-
-.apply-cell{
-    width: 10px;
-}
 hr{
     color: black;
     width: 100%;
-    margin: 0;
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 
 .m-buttons{
     order: 1;
+}
+
+.new-book{
+    border: 2px solid;
+    padding: 4px;
+    width: fit-content;
 }
