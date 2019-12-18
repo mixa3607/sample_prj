@@ -195,7 +195,7 @@ WHERE b.id = ?");
     }
 
     public static function GetBooks($offset = 0, $count = PHP_INT_MAX): ?array {
-        $db_stmt = Db::GetDb()->prepare("select b.id, b.`name` as title, CONCAT(s.path, p.`name`) as picture
+        $db_stmt = Db::GetDb()->prepare("select b.id, b.`name` as title, CONCAT(s.path, p.`name`) as picture, b.publish_date
 from books b 
 LEFT JOIN pictures p ON b.pic_id = p.id
 LEFT JOIN storages s ON p.storage_id = s.id
@@ -214,6 +214,7 @@ OFFSET ?");
                 $book->image = $row[2];
                 $book->authors = DbLibrary::GetBookAuthors($book->id);
                 $book->genres = DbLibrary::GetBookGenres($book->id);
+                $book->pubDate = $row[3];
                 array_push($books, $book);
             }
             return $books;
@@ -276,6 +277,26 @@ where b.id = ?");
         return $db_stmt->affected_rows != 0;
     }
 
+    public static function GetGenres(): array {
+        $db_stmt = Db::GetDb()->prepare("SELECT name FROM genres");
+        $db_stmt->execute();
+        $db_result = $db_stmt->get_result();
+        $genres = array();
+        foreach ($db_result->fetch_all() as $arr){
+            array_push($genres, $arr[0]);
+        }
+        return $genres;
+    }
 
+    public static function GetAuthors(): array {
+        $db_stmt = Db::GetDb()->prepare("SELECT name FROM authors");
+        $db_stmt->execute();
+        $db_result = $db_stmt->get_result();
+        $authors = array();
+        foreach ($db_result->fetch_all() as $arr){
+            array_push($authors, $arr[0]);
+        }
+        return $authors;
+    }
 
 }

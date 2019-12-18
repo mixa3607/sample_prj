@@ -1,7 +1,8 @@
 <?php
 
-use Api\BookApi;
-use Api\BooksApi;
+//use Api\BookApi;
+//use Api\BooksApi;
+//use Api\GenresApi;
 
 spl_autoload_register(function ($class) {
     include $class . '.php';
@@ -20,15 +21,21 @@ if ($path_nodes[1] != "api"){
 
 switch ($path_nodes[2]){
     case "book":
-        $api = new BookApi($_SERVER['REQUEST_METHOD'], $args); break;
-
+        $api_name = "Api\BookApi"; break;
     case "books":
-        $api = new BooksApi($_SERVER['REQUEST_METHOD'], $args); break;
+        $api_name = "Api\BooksApi"; break;
+    case "genres":
+        $api_name = "Api\GenresApi"; break;
+    case "authors":
+        $api_name = "Api\AuthorsApi"; break;
     default:
         print(json_encode(Array('code' => 404, 'error' => 'api not found')));
         http_response_code(404);
         return;
 }
+
+//$api_name = "Api\" + $api_name;
+$api = new $api_name($_SERVER['REQUEST_METHOD'], $args);
 $api->run();
 
 return;

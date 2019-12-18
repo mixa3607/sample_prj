@@ -44,9 +44,10 @@ abstract class ApiProt
         }
     }
 
-    protected function response($data, $status = 500) {
+    protected function response($data, $status = 200) {
         http_response_code($status);
-        //$data['code'] = $status;
+        $data = (array)$data;
+        $data['code'] = $status;
         return json_encode($data);
     }
 

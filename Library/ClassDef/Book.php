@@ -11,4 +11,5 @@ class Book
     public $image;
     public $authors;
     public $genres;
+    public $pubDate;
 }
