@@ -12,9 +12,9 @@ class Api {
     }
 
     static async addBook(book){
-        let url = `/api/book?title=${book.title}&pub_date=${book.pubDate}`;
-        book.authors.forEach(author => url += "&authors[]=" + author);
-        book.genres.forEach(genre => url += "&genres[]=" + genre);
+        let url = `/api/book?title=${encodeURIComponent(book.title)}&pub_date=${book.pubDate}`;
+        book.authors.forEach(author => url += "&authors[]=" + encodeURIComponent(author));
+        book.genres.forEach(genre => url += "&genres[]=" + encodeURIComponent(genre));
         let resp = await fetch(url, {method: 'POST'});
         //if (resp.code === 200){
             return await resp.json();
@@ -25,20 +25,21 @@ class Api {
     }
 
     static async changeBookTitle(bookId, title) {
-        let req = await fetch(`/api/book?id=${bookId}$title=${title}`, {method: 'PUT'});
+        title = encodeURIComponent(title);
+        let req = await fetch(`/api/book?id=${bookId}&title=${title}`, {method: 'PUT'});
         let respJson = await req.json();
         return respJson;
     }
 
     static async changeBookPubDate(bookId, pubDate) {
-        let req = await fetch(`/api/book?id=${bookId}$pub_date=${pubDate}`, {method: 'PUT'});
+        let req = await fetch(`/api/book?id=${bookId}&pub_date=${pubDate}`, {method: 'PUT'});
         let respJson = await req.json();
         return respJson;
     }
 
     static async changeBookAuthors(bookId, authors) {
         let url = `/api/book?id=${bookId}`;
-        authors.forEach(author => url += "&authors[]=" + author);
+        authors.forEach(author => url += "&authors[]=" + encodeURIComponent(author));
 
         let req = await fetch(url, {method: 'PUT'});
         let respJson = await req.json();
@@ -47,7 +48,7 @@ class Api {
 
     static async changeBookGenres(bookId, genres) {
         let url = `/api/book?id=${bookId}`;
-        genres.forEach(genre => url += "&genres[]=" + genre);
+        genres.forEach(genre => url += "&genres[]=" + encodeURIComponent(genre));
 
         let req = await fetch(url, {method: 'PUT'});
         let respJson = await req.json();
