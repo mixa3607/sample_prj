@@ -226,7 +226,7 @@ OFFSET ?");
 
 
     public static function GetBook($id): Book {
-        $db_stmt = Db::GetDb()->prepare("select b.id, b.`name` as title, CONCAT(s.path, p.`name`) as picture
+        $db_stmt = Db::GetDb()->prepare("select b.id, b.`name` as title, CONCAT(s.path, p.`name`) as picture, b.publish_date
 from books b 
 LEFT JOIN pictures p ON b.pic_id = p.id
 LEFT JOIN storages s ON p.storage_id = s.id
@@ -242,6 +242,7 @@ where b.id = ?");
             $book->image = $row[2];
             $book->authors = DbLibrary::GetBookAuthors($book->id);
             $book->genres = DbLibrary::GetBookGenres($book->id);
+            $book->pubDate = $row[3];
             return $book;
         }
         else{
