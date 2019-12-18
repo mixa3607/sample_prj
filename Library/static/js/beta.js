@@ -8,14 +8,14 @@ class HtmlHelpers{
     static addAuthor(container){
         let div = "<div class=\"flex-container author-container\">\n" +
             "<button class=\"butt-del\">del</button>\n" +
-            "<input type='text' class=\"name\"/></div>";
+            "<input type='text' list='authors-list' class=\"name\"/></div>";
         container.insertAdjacentHTML('beforeend', div);
     }
 
     static addGenre(container){
         let div = "<div class=\"flex-container genre-container\">\n" +
             "<button class=\"butt-del\">del</button>\n" +
-            "<input type='text' class=\"name\"/></div>";
+            "<input type='text' list='genres-list' class=\"name\"/></div>";
         container.insertAdjacentHTML('beforeend', div);
     }
 
@@ -66,7 +66,19 @@ class HtmlHelpers{
 
         let booksTable = document.querySelector("#books-table > tbody");
         booksTable.insertAdjacentHTML('beforeend', row);
-        addHandlers();
+        ClickHandlers.addHandlers();
+    }
+
+    static addDatalist(values, elemId){
+        let content = document.querySelector(".content");
+        let datalist = document.createElement("datalist");
+        datalist.id = elemId;
+        values.forEach(value => {
+            let option = document.createElement("option");
+            option.value = value;
+            datalist.appendChild(option);
+        });
+        content.appendChild(datalist);
     }
 }
 
@@ -83,30 +95,36 @@ class ClickHandlers{
         addFuncToClick(".new-book", ClickHandlers.addBookClickHandler);
     }
 
-    static authorsClickHandler(sender){
+    static async authorsClickHandler(sender){
         let applyButt = sender.currentTarget.querySelector(".butt-apply");
-        let hideApplyButt;
+        let hideApplyButt = false;
+        let currentTarget = sender.currentTarget;
         //del
         if (sender.target.matches('.author-container > .butt-del')){
             sender.target.parentElement.remove();
-            hideApplyButt = false;
         }
         //add
         else if (sender.target.matches('.authors-container > .m-buttons > .butt-add')){
-            HtmlHelpers.addAuthor(sender.currentTarget.querySelector(".authors-container"));
-            hideApplyButt = false;
+            HtmlHelpers.addAuthor(currentTarget.querySelector(".authors-container"));
         }
         //apply
         else if (sender.target.matches('.authors-container > .m-buttons > .butt-apply')){
             let authors = [];
-            let inputs = sender.currentTarget.querySelectorAll(".author-container > input[type=text]");
-            let ps = sender.currentTarget.querySelectorAll(".author-container > p.name");
+            let inputs = currentTarget.querySelectorAll(".author-container > input[type=text]");
+            let ps = currentTarget.querySelectorAll(".author-container > p.name");
             authors = authors.concat(getElemText(inputs));
             authors = authors.concat(getElemText(ps));
-            alert(authors.join(', '));//api call to apply authors
-            let authorContainers = sender.currentTarget.querySelectorAll(".author-container");
-            inputsToP(authorContainers);
-            applyButt.hidden = true;
+            let bookId = getBookId(currentTarget);
+
+            let result = await Api.changeBookAuthors(bookId, authors);
+            if (result.code == 200){
+                let authorContainers = currentTarget.querySelectorAll(".author-container");
+                inputsToP(authorContainers);
+                hideApplyButt = true;
+            }
+            else{
+                alert(`Error: ${result.code}. ${result.error_description}`);
+            }
         }
         else{
             return;
@@ -116,27 +134,34 @@ class ClickHandlers{
         }
     }
 
-    static genresClickHandler(sender){
-        let hideApplyButt;
+    static async genresClickHandler(sender){
+        let hideApplyButt = false;
+        let currentTarget = sender.currentTarget;
         let applyButt = sender.currentTarget.querySelector(".butt-apply");
+
         if (sender.target.matches('.genre-container > .butt-del')){
             sender.target.parentElement.remove();
-            hideApplyButt = false;
         }
         else if (sender.target.matches('.genres-container > .m-buttons > .butt-add')){
-            HtmlHelpers.addGenre(sender.currentTarget.querySelector(".genres-container"));
-            hideApplyButt = false;
+            HtmlHelpers.addGenre(currentTarget.querySelector(".genres-container"));
         }
         else if (sender.target.matches('.genres-container > .m-buttons > .butt-apply')){
             let genres = [];
-            let inputs = sender.currentTarget.querySelectorAll(".genre-container > input[type=text]");
-            let ps = sender.currentTarget.querySelectorAll(".genre-container > p.name");
+            let inputs = currentTarget.querySelectorAll(".genre-container > input[type=text]");
+            let ps = currentTarget.querySelectorAll(".genre-container > p.name");
             genres = genres.concat(getElemText(inputs));
             genres = genres.concat(getElemText(ps));
-            alert(genres.join(', '));//api call to apply authors
-            let genresContainers = sender.currentTarget.querySelectorAll(".genre-container");
-            inputsToP(genresContainers);
-            hideApplyButt = true;
+
+            let bookId = getBookId(currentTarget);
+            let result = await Api.changeBookGenres(bookId, genres);
+            if (result.code == 200){
+                let genresContainers = currentTarget.querySelectorAll(".genre-container");
+                inputsToP(genresContainers);
+                hideApplyButt = true;
+            }
+            else{
+                alert(`Error: ${result.code}. ${result.error_description}`);
+            }
         }
         else{
             return;
@@ -146,45 +171,59 @@ class ClickHandlers{
         }
     }
 
-    static pubDateClickHandler(sender){
+    static async pubDateClickHandler(sender){
+        let currentTarget = sender.currentTarget;
         if (sender.target.matches(".butt-edit")){
-            let pubDateElem = sender.currentTarget.querySelector(".pub-date");
+            let pubDateElem = currentTarget.querySelector(".pub-date");
             if (pubDateElem.tagName === "P"){
                 let inputElem = document.createElement("input");
                 inputElem.type = "date";
                 inputElem.className = "pub-date";
                 inputElem.value = pubDateElem.textContent;
-                sender.currentTarget.replaceChild(inputElem, pubDateElem);
+                currentTarget.replaceChild(inputElem, pubDateElem);
             }
             else{
-                let pElem = document.createElement("p");
-                pElem.className = "pub-date";
-                pElem.textContent = pubDateElem.value;
-                sender.currentTarget.replaceChild(pElem, pubDateElem);
+                let result = await Api.changeBookPubDate(getBookId(sender.target), pubDateElem.value);
+                if (result.code == 200 || result.code == 801){
+                    let pElem = document.createElement("p");
+                    pElem.className = "pub-date";
+                    pElem.textContent = pubDateElem.value;
+                    currentTarget.replaceChild(pElem, pubDateElem);
+                }
+                if (result.code != 200){
+                    alert(`Error: ${result.code}. ${result.error_description}`);
+                }
             }
         }
     }
 
-    static titleClickHandler(sender){
+    static async titleClickHandler(sender){
+        let currentTarget = sender.currentTarget;
         if (sender.target.matches(".butt-edit")){
-            let pubDateElem = sender.currentTarget.querySelector(".book-title");
+            let pubDateElem = currentTarget.querySelector(".book-title");
             if (pubDateElem.tagName === "P"){
                 let inputElem = document.createElement("input");
                 inputElem.type = "text";
                 inputElem.className = "book-title";
                 inputElem.value = pubDateElem.textContent;
-                sender.currentTarget.replaceChild(inputElem, pubDateElem);
+                currentTarget.replaceChild(inputElem, pubDateElem);
             }
             else{
-                let pElem = document.createElement("p");
-                pElem.className = "book-title";
-                pElem.textContent = pubDateElem.value;
-                sender.currentTarget.replaceChild(pElem, pubDateElem);
+                let result = await Api.changeBookTitle(getBookId(sender.target), pubDateElem.value);
+                if (result.code == 200 || result.code == 801){
+                    let pElem = document.createElement("p");
+                    pElem.className = "book-title";
+                    pElem.textContent = pubDateElem.value;
+                    currentTarget.replaceChild(pElem, pubDateElem);
+                }
+                if (result.code != 200){
+                    alert(`Error: ${result.code}. ${result.error_description}`);
+                }
             }
         }
     }
 
-    static addBookClickHandler(sender) {
+    static async addBookClickHandler(sender) {
         if (sender.target.matches(".butt-add-book")){
             let container = sender.currentTarget;
             let title = container.querySelector(".title input").value;
@@ -193,18 +232,29 @@ class ClickHandlers{
             let authors = getElemText(container.querySelectorAll(".authors .name"));
 
             let book = {"title": title, "authors": authors, "genres": genres, "pubDate": date};
-            book['id'] = 20; //api call add book
-            HtmlHelpers.addBookToList(book);
-            flushNewBook(container);
+            let result = await Api.addBook(book);
+            if (result.code == 200){
+                book['id'] = result.book_id;
+                HtmlHelpers.addBookToList(book);
+                flushNewBook(container);
+            }
+            else{
+                alert(`Error: ${result.code}. ${result.error_description}`)
+            }
         }
     }
 
-    static delBookClickHandler(sender) {
+    static async delBookClickHandler(sender) {
         if (sender.target.matches(".butt-del")){
             let bookRow = getBookRow(sender.target);
             let bookId = bookRow.getAttribute("book");
-            //alert(bookId);
-            bookRow.remove();
+            let result = await Api.deleteBook(bookId);
+            if (result.code == 200){
+                bookRow.remove();
+            }
+            else{
+                alert(`Error: ${result.code}. ${result.error_description}`)
+            }
         }
     }
 }
@@ -251,9 +301,29 @@ function getBookRow(childElem){
     return currentElem;
 }
 
-function addBooks(){
+function getBookId(childElem){
+    let bookId = getBookRow(childElem).getAttribute("book");
+    return bookId;
+}
 
+async function addBooks(){
+    let json = await Api.getBooks();
+    if (json.code == 200){
+        json.books.forEach( book => HtmlHelpers.addBookToList(book));
+        //ClickHandlers.addHandlers();
+    }
+    else{
+        alert("Api return error")
+    }
+}
+
+function addDatalists(){
+    Api.getAuthors().then(json => {HtmlHelpers.addDatalist(json.authors, "authors-list")});
+    Api.getGenres().then(json => {HtmlHelpers.addDatalist(json.genres, "genres-list")});
 }
 
 
-window.onload = ClickHandlers.addHandlers;
+window.onload = () => {
+    addBooks().then(ClickHandlers.addHandlers);
+    addDatalists();
+};
