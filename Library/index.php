@@ -1,6 +1,6 @@
 <?php
 spl_autoload_register(function ($class) {
-    include $class . '.php';
+    include str_replace('\\', '/', $class . '.php');
 });
 
 list($path, $qs) = explode("?", $_SERVER["REQUEST_URI"], 2);
