@@ -6,7 +6,7 @@ function addFuncToClick(classQuery, functionName){
 
 class HtmlHelpers{
     static addAuthorOrGenre(container, isAuthor, value = "", isP = false){
-        let listName = "genres-List";
+        let listName = "genres-list";
         let containerClassName = "genre-container";
         if (isAuthor){
             listName = "authors-list";
