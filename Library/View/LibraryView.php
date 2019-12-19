@@ -1,21 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <title>Library</title>
-    <link rel="stylesheet" href="/static/css/main.css">
-    <script type="application/javascript" src="/static/js/api.js"></script>
-    <script type="application/javascript" src="/static/js/beta.js"></script>
-</head>
-<body>
-<div class="container">
-    <div class="header">
+<?php
 
-    </div>
-    <div class="content">
+
+namespace View;
+
+
+use Model\DbLibrary;
+
+class LibraryView
+{
+    public function DrawPage(){
+        Template::PrintHtmlHeadStart();
+        Template::PrintPageHead();
+        Template::PrintPageBody("", $this->MakeBody(), "");
+        Template::PrintHtmlHeadEnd();
+    }
+
+    private function MakeBody(): string {
+        return <<<EOF
         <div class="books">
             <table id="books-table">
                 <tbody>
-
                 </tbody>
             </table>
         </div>
@@ -52,7 +56,6 @@
             <hr>
             <button class="butt-add-book">Add book</button>
         </div>
-    </div>
-</div>
-</body>
-</html>
+EOF;
+    }
+}

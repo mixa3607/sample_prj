@@ -4,7 +4,7 @@
 namespace Model;
 
 
-class Library
+class LibraryModel
 {
     public function GetBooks(): array{
         return DbLibrary::GetBooks();
