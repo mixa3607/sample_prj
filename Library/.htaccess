@@ -2,12 +2,13 @@ IndexIgnore */*
 RewriteEngine on
 RewriteBase /
 
+ErrorDocument 404 /index.php
 #icon
 RewriteRule ^favicon.ico$ /static/images/favicon.ico [NC,L,END]
 
 #static files
-RewriteCond %{REQUEST_FILENAME} "/static/.*"
-RewriteRule (.*) \1 [NC,L,END]
+RewriteCond %{REQUEST_FILENAME} ".*static/.*"
+RewriteRule (.*) $1 [NC,L,END]
 
 #api
 RewriteRule ^api/.*$ /api.php [NC,QSA,END]
@@ -16,4 +17,4 @@ RewriteRule ^api/.*$ /api.php [NC,QSA,END]
 RewriteRule ^$ /index.php [NC,L,END]
 
 #redirect to front
-RewriteRule ^.*$ / [R=301,L]
+RewriteRule ^.*$ / [R=301,L,END]

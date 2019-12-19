@@ -4,12 +4,13 @@ spl_autoload_register(function ($class) {
 });
 
 list($path, $qs) = explode("?", $_SERVER["REQUEST_URI"], 2);
-$path_nodes = explode("/", $path);
+//$path_nodes = explode("/", $path);
 
-switch ($path_nodes[1]){
-    case '':
-        \Controller\Library::ComposePage();
+switch ($path){
+    case '/':
+        \Controller\LibraryController::ComposePage();
         break;
+    case '404':
     default:
         \Controller\NotFound::ComposePage();
         break;
