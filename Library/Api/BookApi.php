@@ -172,6 +172,7 @@ class BookApi extends ApiProt
         }
 
         if ($genres && count($genres) != 0){
+            $genres = array_values(array_unique($genres, SORT_STRING));
             $genres_ids = DbLibrary::GetGenresIds($genres);
             for ($i = 0; $i < count($genres); $i++){
                 if (!$genres_ids[$i]){
@@ -181,13 +182,9 @@ class BookApi extends ApiProt
                 }
             }
             DbLibrary::FlushBookGenres($book_id);
-            //
             //if (!DbLibrary::FlushBookGenres($book_id)){
-            //
             //    $response = $this->returnError(800, 404, 'Update book error. Maybe book not exist?');
-            //
             //    print($response);
-            //
             //    return;
             //}
             foreach ($genres_ids as $genre_id){
@@ -199,6 +196,7 @@ class BookApi extends ApiProt
         }
 
         if ($authors && count($authors) != 0){
+            $authors = array_values(array_unique($authors, SORT_STRING));
             $authors_ids = DbLibrary::GetAuthorsIds($authors);
             for ($i = 0; $i < count($authors); $i++){
                 if (!$authors_ids[$i]){
@@ -216,7 +214,7 @@ class BookApi extends ApiProt
             foreach ($authors_ids as $author_id){
                 DbLibrary::AssignAuthorToBook($book_id, $author_id);
             }
-            $response = $this->response(['book_id' => $book_id, '$authors' => $authors], 200);
+            $response = $this->response(['book_id' => $book_id, 'authors' => $authors], 200);
             print($response);
             return;
         }

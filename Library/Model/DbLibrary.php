@@ -215,6 +215,10 @@ OFFSET ?");
                 $book->authors = DbLibrary::GetBookAuthors($book->id);
                 $book->genres = DbLibrary::GetBookGenres($book->id);
                 $book->pubDate = $row[3];
+
+                sort($book->authors, SORT_STRING);
+                sort($book->genres, SORT_STRING);
+
                 array_push($books, $book);
             }
             return $books;
@@ -243,6 +247,10 @@ where b.id = ?");
             $book->authors = DbLibrary::GetBookAuthors($book->id);
             $book->genres = DbLibrary::GetBookGenres($book->id);
             $book->pubDate = $row[3];
+
+            sort($book->authors, SORT_STRING);
+            sort($book->genres, SORT_STRING);
+
             return $book;
         }
         else{
